@@ -1,0 +1,158 @@
+<?php namespace DP\Wp;
+
+class WpStd
+{ 
+    // SECTION Public
+
+     /**
+     * Updates post meta for a post. It also automatically deletes or adds the value to field_name if specified
+     *
+     * @access     protected
+     * @param      integer     The post ID for the post we're updating
+     * @param      string      The field we're updating/adding/deleting
+     * @param      string      [Optional] The value to update/add for field_name. If left blank, data will be deleted.
+     * @return int|false       Meta ID (or true if deleting) success, false on failure.
+     */
+    public static function update_post_meta(int $post_id, string $field_name, $value = '')
+    {
+        $res = false;
+        if (empty($value) or !$value) {
+            $res = delete_post_meta($post_id, $field_name);
+        } elseif (!get_post_meta($post_id, $field_name)) {
+            $res = add_post_meta($post_id, $field_name, $value);
+        } else {
+            $res = update_post_meta($post_id, $field_name, $value);
+        }
+        return $res;
+    }
+
+    public static function is_post_type($type){
+        global $wp_query;
+        if($type == get_post_type($wp_query->post->ID)) 
+            return true;
+        return false;
+    }
+
+    // $exceptionTerms taxonomy-name=>taxonomy-value  Set force to False if you want to send them to Trash.
+    public static function delete_meta_in_all_posts(string $postType, string $metaId, array $exceptionByTaxonomy = null) 
+    { 
+        $allCountryPosts = get_posts(array(
+            'post_type' => $postType,
+            'numberposts' => -1
+        ));  
+        foreach ($allCountryPosts as $post) 
+        {
+            $doNotDelete = false;
+            if ($exceptionByTaxonomy)
+            {
+                foreach ($exceptionByTaxonomy as $taxonomyName => $taxonomyValue)
+                {
+
+                    if (has_term($taxonomyValue, $taxonomyName, $post)) 
+                    {
+                        $doNotDelete = true;
+                        break;   
+                    }  
+                }
+            }
+            if (!$doNotDelete)
+            {
+                self::update_post_meta($post->ID, $metaId);
+            }
+        }
+    }
+
+    // $exceptionTerms taxonomy-name=>taxonomy-value  Set force to False if you want to send them to Trash.
+    public static function delete_all_posts(string $postType, bool $force = true, array $exceptionByTaxonomy = null) 
+    { 
+
+        $allCountryPosts = get_posts(array(
+            'post_type' => $postType,
+            'numberposts' => -1
+        ));
+        foreach ($allCountryPosts as $post) 
+        {
+            $doNotDelete = false;
+            if ($exceptionByTaxonomy)
+            {
+                foreach ($exceptionByTaxonomy as $taxonomyName => $taxonomyValue)
+                {
+
+                    if (has_term($taxonomyValue, $taxonomyName, $post)) 
+                    {
+                        $doNotDelete = true;
+                        break;   
+                    }  
+                }
+            }
+            if (!$doNotDelete)
+            {
+                wp_delete_post($post->ID, $force);   
+            }
+        }
+    }
+
+    /*public static function set_post_featured_img(int $postId, string $uploadedImgFilePath)
+    {
+        if ( $postId && $uploadedImgFilePath ) {
+            $wp_filetype = wp_check_filetype($uploadedImgFilePath, null );
+            $attachment = array(
+                'post_mime_type' => $wp_filetype['type'],
+                'post_title' => sanitize_file_name($uploadedImgFilePath),
+                'post_content' => '',
+                'post_status' => 'inherit'
+            );
+            $attach_id = wp_insert_attachment( $attachment, $uploadedImgFilePath, $postId );
+            require_once(ABSPATH . 'wp-admin/includes/image.php');
+            $attach_data = wp_generate_attachment_metadata( $attach_id, $uploadedImgFilePath );
+            wp_update_attachment_metadata( $attach_id, $attach_data );
+            set_post_thumbnail( $postId, $attach_id );
+        }   
+    }*/
+
+    /**
+     * Get the current archive post type name (e.g: post, page, product).
+     *
+     * @return String|Boolean  The archive post type name or false if not in an archive page.
+     */
+    public static function get_archive_name() {
+        return is_archive() ? get_queried_object()->name : false;
+    }
+
+    public static function get_image_id($image_url) {
+        global $wpdb;
+        $attachment = $wpdb->get_col($wpdb->prepare("SELECT id FROM $wpdb->posts WHERE guid='%s';", $image_url )); 
+            return $attachment[0]; 
+    }
+
+    /**
+     * post_exists_by_slug.
+     *
+     * @return mixed boolean false if no post exists; post ID otherwise.
+     */
+    public static function post_exists_by_slug( $post_slug, $post_type = 'post') {
+        $args = array(
+            'name'        => $post_slug,
+            'post_type'   => $post_type,
+            'post_status' => 'any',
+            'numberposts' => 1
+        );
+        $posts = get_posts($args);
+
+        if ( ! $posts || count($posts) == 0 ) {
+            return false;
+        } else {
+            
+            return $posts[0]->ID;
+        }
+    }
+
+
+    // !SECTION End - Public
+
+
+    // SECTION Private
+
+    
+    // !SECTION End - Private
+}

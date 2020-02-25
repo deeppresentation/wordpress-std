@@ -1,0 +1,25 @@
+{
+    "name": "deeppresentation/wordpress-std",
+    "description": "Standard php library according to PSR-4 with classes for easement and speed-up wordpress development process.",
+    "type": "library",
+    "keywords": ["psr-4", "library", "composer package", "standartd", "wordpress"],
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Tomas Groulik",
+            "email": "tomas@deeppresentation.com",
+            "homepage": "https://github.com/deeppresentation/wordpress-std",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {
+        "php": ">=7.2.1",
+        "deeppresentation/wordpress-std": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "DP\\Wp\\": "src"
+        }
+    }
+}
