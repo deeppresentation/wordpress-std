@@ -27,6 +27,7 @@ class Acf
             }*/
             if ($table && is_array($table))
             {
+                
                 return self::decode_raw_to_assoc_array_of_columns($table);
             }
         
@@ -142,6 +143,19 @@ class Acf
             update_field($relationShipFieldTag, [], $postId);     
         }
     }
+
+    public static function get_group_field(string $groupId, string $fieldId, ?int $postId = null, $def = null ){
+        if (!$postId) $postId = get_the_ID();
+        $res = get_field($groupId . '_' . $fieldId, $postId, false);
+        if (!isset($res)) return $def;
+        return $res;
+    }
+
+    public static function update_group_field(string $groupId, string $fieldId, $valueToSet, ?int $postId = null ){
+        if (!$postId) $postId = get_the_ID();
+        update_field($groupId . '_' . $fieldId, $valueToSet, $postId);  
+    }
+
     
     public static function append_relationship($relatedPostId, string $relationShipFieldTag, ?int $postId = null)
     {

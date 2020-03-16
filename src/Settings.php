@@ -16,10 +16,10 @@ class Settings
         }       
     }
 
-    public static function update_setting_array(string $optionId, string $optionSubFieldId, $value) : bool
+    public static function update_setting_array(string $optionId, string $optionSubFieldId, $value, bool $createIfNotExist = false) : bool
     {
         $options = get_option($optionId);      
-        if ($options && array_key_exists($optionSubFieldId, $options)) {
+        if ($options && (array_key_exists($optionSubFieldId, $options) || $createIfNotExist)) {
             $options[$optionSubFieldId] = $value;
             return update_option($optionId, $options); 
         }  
@@ -130,14 +130,18 @@ class Settings
             'name' => $id 
         ], $renderArgs);
 
-        add_settings_field(
-            $id,						        // ID used to identify the field throughout the theme
-            __($title, $textDomain),	        // The label to the left of the option interface element
-            'DP\Wp\Settings::render_option',	        // The name of the function responsible for rendering the option interface
-            $page,                              // The page on which this option will be displayed
-            $section,
-            $args
-        );     
+        if (!$renderArgs['hidden'])
+        {
+            add_settings_field(
+                $id,						        // ID used to identify the field throughout the theme
+                __($title, $textDomain),	        // The label to the left of the option interface element
+                'DP\Wp\Settings::render_option',	        // The name of the function responsible for rendering the option interface
+                $page,                              // The page on which this option will be displayed
+                $section,
+                $args
+            );     
+        }
+        
     }
 
 
@@ -150,62 +154,71 @@ class Settings
         $type = Arr::sget($args, 'type', 'text');
         $value = Arr::sget($args, 'value', '');
         $placeholder = Arr::sget($args, 'placeholder', '');
+        $hidden = Arr::sget($args, 'hidden', false);
+        $disabled = Arr::sget($args, 'disabled', '0') == '1';
 
-        $id = implode('-', [$page, $type, $name]);
-        switch ($type)
+        if (!$hidden)
         {
-           case 'text':
-                Html::render('input', null, null, null, [
-                    'type' => 'text',
-                    'id' => $id,
-                    'name' => $page.'[' . $name . ']',
-                    'value' => $value,
-                    'size' => $size,
-                    'placeholder' => $placeholder
-                ]);
-            break;
-            case 'checkbox':
-                Html::render('input', null, null, null, [
-                    'type' => 'checkbox',
-                    'id' => $id,
-                    'name' => $page.'[' . $name . ']',
-                    'value' => '1',
-                     checked(1 , $value, false),
-                    'size' => $size,
-                    'placeholder' => $placeholder
-                ]);
+            $id = implode('-', [$page, $type, $name]);
+            switch ($type)
+            {
+            case 'text':
+                    Html::render('input', null, null, null, [
+                        'type' => 'text',
+                        'id' => $id,
+                        'name' => $page.'[' . $name . ']',
+                        'value' => $value,
+                        'size' => $size,
+                        'placeholder' => $placeholder,
+                        'disabled' => $disabled ? "disabled" : null,
+                    ]);
                 break;
-            case 'textarea':   
-                Html::render('textarea', null, null, $value, [
-                    'id' => $id,
-                    'name' => $page.'[' . $name . ']',
-                    'cols' => $size,
-                    'rows' => Arr::sget($args, 'rowCnt', 5),
-                    'placeholder' => $placeholder,
-                    //'$1' => 'readonly'
-                ]);
-                break;
-            case 'select':
-                $options = Arr::get($args, 'options', []);
-                $optionsHtml = [];
-                foreach ($options as $option)
-                {
-                    $valAndLabel = explode(":", $option);
-                    if (count($valAndLabel))
+                case 'checkbox':
+                    Html::render('input', null, null, null, [
+                        'type' => 'checkbox',
+                        'id' => $id,
+                        'name' => $page.'[' . $name . ']',
+                        'value' => '1',
+                         checked(1 , $value, false),
+                        'disabled' => $disabled ? "disabled" : null,
+                        'size' => $size,
+                        'placeholder' => $placeholder
+                    ]);
+                    break;
+                case 'textarea':   
+                    Html::render('textarea', null, null, $value, [
+                        'id' => $id,
+                        'name' => $page.'[' . $name . ']',
+                        'cols' => $size,
+                        'rows' => Arr::sget($args, 'rowCnt', 5),
+                        'placeholder' => $placeholder,
+                        'disabled' => $disabled ? "disabled" : null,
+                        //'$1' => 'readonly'
+                    ]);
+                    break;
+                case 'select':
+                    $options = Arr::get($args, 'options', []);
+                    $optionsHtml = [];
+                    foreach ($options as $option)
                     {
-                        $optionVal = $valAndLabel[0];
-                        $optionLabel = $optionVal;
-                        if (count($valAndLabel) > 1) $optionLabel = $valAndLabel[1];
-                        $optionsHtml[] = '<option value="' . $option . '" ' . selected( $value, $option, false ) . '>' . $optionLabel . '</option>';
+                        $valAndLabel = explode(":", $option);
+                        if (count($valAndLabel))
+                        {
+                            $optionVal = $valAndLabel[0];
+                            $optionLabel = $optionVal;
+                            if (count($valAndLabel) > 1) $optionLabel = $valAndLabel[1];
+                            $optionsHtml[] = '<option value="' . $optionVal . '" ' . selected( $value, $optionVal, false ) . '>' . $optionLabel . '</option>';
+                        }
                     }
-                }
-                $select = new Element('select', null, [
-                    'id' => $id,
-                    'name' => $page.'[' . $name . ']',
-                    'placeholder' => $placeholder
-                ], $optionsHtml);
-                $select->render();
-                break;
+                    $select = new Element('select', null, [
+                        'id' => $id,
+                        'name' => $page.'[' . $name . ']',
+                        'placeholder' => $placeholder,
+                        'disabled' => $disabled ? "disabled" : null,
+                    ], $optionsHtml);
+                    $select->render();
+                    break;
+            }
         }
     }
 }
