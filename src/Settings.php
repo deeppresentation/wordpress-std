@@ -130,7 +130,7 @@ class Settings
             'name' => $id 
         ], $renderArgs);
 
-        if (!$renderArgs['hidden'])
+        if (!Arr::get($renderArgs, 'hidden', null))
         {
             add_settings_field(
                 $id,						        // ID used to identify the field throughout the theme
@@ -156,6 +156,8 @@ class Settings
         $placeholder = Arr::sget($args, 'placeholder', '');
         $hidden = Arr::sget($args, 'hidden', false);
         $disabled = Arr::sget($args, 'disabled', '0') == '1';
+        $readonly = Arr::sget($args, 'readonly', '0') == '1';    
+        
 
         if (!$hidden)
         {
@@ -163,14 +165,16 @@ class Settings
             switch ($type)
             {
             case 'text':
+                    $inputType =  Arr::sget($args, 'inputType', 'text'); 
                     Html::render('input', null, null, null, [
-                        'type' => 'text',
+                        'type' => $inputType,
                         'id' => $id,
                         'name' => $page.'[' . $name . ']',
                         'value' => $value,
                         'size' => $size,
                         'placeholder' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
+                        'readonly' => $readonly ? "readonly" : null,
                     ]);
                 break;
                 case 'checkbox':
@@ -181,6 +185,7 @@ class Settings
                         'value' => '1',
                          checked(1 , $value, false),
                         'disabled' => $disabled ? "disabled" : null,
+                        'readonly' => $readonly ? "readonly" : null,
                         'size' => $size,
                         'placeholder' => $placeholder
                     ]);
@@ -193,6 +198,7 @@ class Settings
                         'rows' => Arr::sget($args, 'rowCnt', 5),
                         'placeholder' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
+                        'readonly' => $readonly ? "readonly" : null,
                         //'$1' => 'readonly'
                     ]);
                     break;
@@ -215,6 +221,7 @@ class Settings
                         'name' => $page.'[' . $name . ']',
                         'placeholder' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
+                        'readonly' => $readonly ? "readonly" : null,
                     ], $optionsHtml);
                     $select->render();
                     break;
