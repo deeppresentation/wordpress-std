@@ -94,6 +94,20 @@ class Acf
         }
         return false;
     }
+    public static function update_table_field_from_assoc_array_of_columns_ntn(array $assoc_array_of_columns, string $fieldId, $postId = null)
+    {
+        if (!$postId) $postId = get_the_ID();
+        if ($postId)
+        {
+            return WpStd::update_post_meta(
+                $postId, 
+                $fieldId, 
+                Acf::create_table_field_from_assoc_array_of_columns(Arr::transpose($assoc_array_of_columns))
+            );
+        }
+        return false;
+    }
+
 
     public static function create_table_field_from_assoc_array_of_columns(array $dataTableColumns, bool $prependRowNameColumn = false) // asociative array of columns
     {
