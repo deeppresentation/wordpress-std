@@ -72,7 +72,7 @@ class Acf
                 $rowData = [];
                 foreach ($acfTableField['h'] as $hIdx => $headerItem)
                 {
-                    $rowData[Arr::sget($headerItem, 'c', $hIdx)] = Arr::sget($rowDataInput, $hIdx . '.c');
+                    $rowData[Arr::sget($headerItem, 'c', $hIdx)] = wp_specialchars_decode(Arr::sget($rowDataInput, $hIdx . '.c'));
                 }  
                 $res[] = $rowData;  
             }  
