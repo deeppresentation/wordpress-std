@@ -21,7 +21,7 @@ class Acf
         if ($postId)
         {
             $table = get_field($fieldId, $postId, false);
-           /* if (is_string($tableIntroSteps)) asss
+           /* if (is_string($tableIntroSteps))
             {
                 $tableIntroSteps = json_decode($tableIntroSteps, true);
             }*/
