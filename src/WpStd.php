@@ -1,5 +1,7 @@
 <?php namespace DP\Wp;
 
+use DP\Std\Core\Str;
+
 class WpStd
 { 
     // SECTION Public
@@ -146,6 +148,35 @@ class WpStd
             return $posts[0]->ID;
         }
     }
+
+        /**
+     * post_exists_by_slug.
+     *
+     * @return mixed boolean false if no post exists; post ID otherwise.
+     */
+    public static function get_post_by_url( $post_url, $post_type = ['page', 'post']) {
+        $res = get_page_by_path( $post_url, OBJECT, $post_type);
+        if (!$res) {
+            $id = url_to_postid( $post_url );
+            if ($id) $res = get_post($id);
+        }
+        return $res;
+    }
+
+    public static function get_post_ID_from_SERVER_REQ_URL( $post_type = ['page', 'post']) {
+        $currentUrl = Str::separed_first_part($_SERVER['REQUEST_URI'], '?');
+        if ($currentUrl) {
+            $currentPost = self::get_post_by_url($currentUrl, ['page', 'post', 'product']);
+            if ($currentPost) {
+                return $currentPost->ID;
+            }
+        }
+        return null;
+    }
+
+
+
+
 
 
     // !SECTION End - Public
