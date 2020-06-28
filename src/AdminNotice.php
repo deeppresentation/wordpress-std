@@ -1,17 +1,24 @@
 <?php namespace DP\Wp;
 
 use DP\Std\Html\Element;
+use DP\Std\Core\Arr;
 
 
 class AdminNotice
 {
-    public static function render_raw_notice($htmlContent, string $type = 'success', string $noticeBEMClass = 'dp-notice', ?string $id = null)
+    public static function render_raw_notice($htmlContent, string $type = 'success', string $noticeBEMClass = 'dp-notice', ?string $id = null, string $noticeExtraClass = '')
     {
-        $notice = new Element('div', $noticeBEMClass, ['class' => "notice notice-${type} is-dismissible", 'id'=>$id], $htmlContent);
+        $clases = [
+            "notice notice-${type}", 
+            "is-dismissible",
+            $noticeExtraClass
+        ];
+
+        $notice = new Element('div', $noticeBEMClass, ['class' => Arr::as_string($clases, ' '), 'id'=>$id], $htmlContent);
         $notice->render();
     }
 
-    public static function render_notice(string $text, string $type = 'success', bool $hasButton = false, string $buttonLink, string $buttonClass = '', string $buttonText = '', bool $linkInNewTab = true, string $buttonSubText = '', string $noticeBEMClass = 'dp-notice', ?string $id = null)
+    public static function render_notice(string $text, string $type = 'success', bool $hasButton = false, string $buttonLink, string $buttonClass = '', string $buttonText = '', bool $linkInNewTab = true, string $buttonSubText = '', string $noticeBEMClass = 'dp-notice', ?string $id = null, string $noticeExtraClass = '')
     {
         self::render_raw_notice([
             new Element('p', 'text', null, $text),
@@ -21,7 +28,7 @@ class AdminNotice
                     'target' => ($linkInNewTab) ? '_blank' : '',
                 ], [$buttonText, !empty($buttonSubText) ? new Element('span', 'sub-text', null, $buttonSubText) : null])
             ], 
-            $type, $noticeBEMClass, $id
+            $type, $noticeBEMClass, $id, $noticeExtraClass
         );
     }
 
