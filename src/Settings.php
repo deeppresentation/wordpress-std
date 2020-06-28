@@ -19,8 +19,8 @@ class Settings
     public static function update_setting_array(string $optionId, string $optionSubFieldId, $value, bool $createIfNotExist = false) : bool
     {
         $options = get_option($optionId, null);    
-        if ($createIfNotExist && $options) $options = [];  
-        if ($options && (array_key_exists($optionSubFieldId, $options) || $createIfNotExist)) {
+        if (!isset($options) && $createIfNotExist) $options = [];  
+        if (isset($options) && (array_key_exists($optionSubFieldId, $options) || $createIfNotExist)) {
             $options[$optionSubFieldId] = $value;
             return update_option($optionId, $options); 
         }  
