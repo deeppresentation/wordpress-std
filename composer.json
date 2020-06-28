@@ -15,7 +15,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=7.2.1",
-        "deeppresentation/wordpress-std": "^1.0"
+        "deeppresentation/wordpress-std": "dev-master"
     },
     "autoload": {
         "psr-4": {
