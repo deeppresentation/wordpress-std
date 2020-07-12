@@ -15,7 +15,7 @@ class Acf
         return $result;
     }
 
-    public static function get_table_field_as_assoc_array_of_columns(string $fieldId, $postId = null)
+    public static function get_table_field_as_assoc_array_of_columns(string $fieldId, $postId = null, $useHeaderValues = false, &$labels = null)
     {
         if (!$postId) $postId = get_the_ID();
         if ($postId)
@@ -28,7 +28,7 @@ class Acf
             if ($table && is_array($table))
             {
                 
-                return self::decode_raw_to_assoc_array_of_columns($table);
+                return self::decode_raw_to_assoc_array_of_columns($table, $useHeaderValues, $labels);
             }
         
            
@@ -62,17 +62,25 @@ class Acf
 
     }
 
-    public static function decode_raw_to_assoc_array_of_columns(array $acfTableField)
+    public static function decode_raw_to_assoc_array_of_columns(array $acfTableField, $useHeaderValues = false, &$labels = null)
     {
         if (array_key_exists('h', $acfTableField) && array_key_exists('b', $acfTableField))
         {
+            if ($useHeaderValues)
+            {
+                $labels = [];
+                foreach ($acfTableField['h'] as $hIdx => $headerItem)
+                {
+                    $labels[] = Arr::sget($headerItem, 'c', $hIdx); 
+                }     
+            }
             $res = [];
             foreach ($acfTableField['b'] as $rIdx => $rowDataInput)
             {
                 $rowData = [];
                 foreach ($acfTableField['h'] as $hIdx => $headerItem)
                 {
-                    $rowData[Arr::sget($headerItem, 'c', $hIdx)] = wp_specialchars_decode(Arr::sget($rowDataInput, $hIdx . '.c'));
+                    $rowData[Arr::sget($headerItem, $useHeaderValues ? 'v' : 'c', $hIdx)] = wp_specialchars_decode(Arr::sget($rowDataInput, $hIdx . '.c'));
                 }  
                 $res[] = $rowData;  
             }  
@@ -81,7 +89,7 @@ class Acf
         return null;   
     }
 
-    public static function update_table_field_from_assoc_array_of_columns(array $assoc_array_of_columns, string $fieldId, $postId = null)
+    public static function update_table_field_from_assoc_array_of_columns(array $assoc_array_of_columns, string $fieldId, $postId = null, bool $isValueUsed = false, ?array $valOrLabelsKeys = null, ?string $version = null)
     {
         if (!$postId) $postId = get_the_ID();
         if ($postId)
@@ -89,12 +97,12 @@ class Acf
             return WpStd::update_post_meta(
                 $postId, 
                 $fieldId, 
-                Acf::create_table_field_from_assoc_array_of_columns($assoc_array_of_columns)
+                Acf::create_table_field_from_assoc_array_of_columns($assoc_array_of_columns, false, $isValueUsed, $valOrLabelsKeys, $version)
             );
         }
         return false;
     }
-    public static function update_table_field_from_assoc_array_of_columns_ntn(array $assoc_array_of_columns, string $fieldId, $postId = null)
+    public static function update_table_field_from_assoc_array_of_columns_ntn(array $assoc_array_of_columns, string $fieldId, $postId = null, bool $isValueUsed = false, ?array $valOrLabelsKeys = null, ?string $version = null)
     {
         if (!$postId) $postId = get_the_ID();
         if ($postId)
@@ -102,14 +110,14 @@ class Acf
             return WpStd::update_post_meta(
                 $postId, 
                 $fieldId, 
-                Acf::create_table_field_from_assoc_array_of_columns(Arr::transpose($assoc_array_of_columns))
+                Acf::create_table_field_from_assoc_array_of_columns(Arr::transpose($assoc_array_of_columns), false, $isValueUsed, $valOrLabelsKeys, $version)
             );
         }
         return false;
     }
 
 
-    public static function create_table_field_from_assoc_array_of_columns(array $dataTableColumns, bool $prependRowNameColumn = false) // asociative array of columns
+    public static function create_table_field_from_assoc_array_of_columns(array $dataTableColumns, bool $prependRowNameColumn = false, bool $isValueUsed = false, ?array $valOrLabelsKeys = null, ?string $version = null) // asociative array of columns
     {
         
         $header = array();
@@ -121,8 +129,15 @@ class Acf
 
                 // header
                 if ($prependRowNameColumn) $header[] = array('c' =>'');
+                $i = 0;
                 foreach ($columnKeys as $columnKey) {
-                    $header[] = array('c' => self::sanitize_arrays_fields($columnKey));
+                    $headerVal = Arr::sget($valOrLabelsKeys, $i, "");
+                    $headerData = [
+                        'c' => self::sanitize_arrays_fields($isValueUsed ? $headerVal : $columnKey),
+                        'v' => self::sanitize_arrays_fields($isValueUsed ? $columnKey : $headerVal)
+                    ];
+                    $header[] = $headerData;
+                    $i++;
                 }
                 // data rows
                 foreach ($rowKeys as $rowKey) {
@@ -136,7 +151,7 @@ class Acf
             }
         }
         return [
-            'acftf' => array('v' => '1.2.6'),
+            'acftf' => array('v' => $version ?? '1.3.10'),
             'p' => array('o' => array('uh' => 1)),
             'c' => array_fill(0, count($header), array('p' => '')),
             'h' => $header,
@@ -144,9 +159,9 @@ class Acf
         ];
     }
 
-    public static function table_encode_from_assoc_array_of_columns(array $dataTableColumns, bool $prependRowNameColumn = false, int $jsonEncodeBitMaskOption = 0) // asociative array of columns
+    public static function table_encode_from_assoc_array_of_columns(array $dataTableColumns, bool $prependRowNameColumn = false, int $jsonEncodeBitMaskOption = 0, bool $isValueUsed = false, ?array $valOrLabelsKeys = null, ?string $version = null) // asociative array of columns
     {
-        return json_encode(self::create_table_field_from_assoc_array_of_columns($dataTableColumns, $prependRowNameColumn), $jsonEncodeBitMaskOption);
+        return json_encode(self::create_table_field_from_assoc_array_of_columns($dataTableColumns, $prependRowNameColumn, $isValueUsed, $valOrLabelsKeys, $version), $jsonEncodeBitMaskOption);
     }
 
     public static function clear_relationships(string $relationShipFieldTag, ?int $postId = null)
