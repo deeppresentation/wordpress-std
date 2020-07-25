@@ -116,6 +116,12 @@ class Acf
         return false;
     }
 
+    
+    public static function create_table_field_from_assoc_array_of_columns_ntn(array $dataTableColumns, bool $prependRowNameColumn = false, bool $isValueUsed = false, ?array $valOrLabelsKeys = null, ?string $version = null) // asociative array of columns
+    {
+        return self::create_table_field_from_assoc_array_of_columns(Arr::transpose($dataTableColumns), $prependRowNameColumn, $isValueUsed, $valOrLabelsKeys, $version);   
+    }
+
 
     public static function create_table_field_from_assoc_array_of_columns(array $dataTableColumns, bool $prependRowNameColumn = false, bool $isValueUsed = false, ?array $valOrLabelsKeys = null, ?string $version = null) // asociative array of columns
     {
