@@ -174,6 +174,7 @@ class Settings
                         'value' => $value,
                         'size' => $size,
                         'placeholder' => $placeholder,
+                        'title' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
                         'readonly' => $readonly ? "readonly" : null,
                     ]);
@@ -188,7 +189,8 @@ class Settings
                         'disabled' => $disabled ? "disabled" : null,
                         'readonly' => $readonly ? "readonly" : null,
                         'size' => $size,
-                        'placeholder' => $placeholder
+                        'placeholder' => $placeholder,
+                        'title' => $placeholder
                     ]);
                     break;
                 case 'textarea':   
@@ -198,6 +200,7 @@ class Settings
                         'cols' => $size,
                         'rows' => Arr::sget($args, 'rowCnt', 5),
                         'placeholder' => $placeholder,
+                        'title' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
                         'readonly' => $readonly ? "readonly" : null,
                         //'$1' => 'readonly'
@@ -221,6 +224,7 @@ class Settings
                         'id' => $id,
                         'name' => $page.'[' . $name . ']',
                         'placeholder' => $placeholder,
+                        'title' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
                         'readonly' => $readonly ? "readonly" : null,
                     ], $optionsHtml);
