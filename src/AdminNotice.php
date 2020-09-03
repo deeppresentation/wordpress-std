@@ -18,7 +18,7 @@ class AdminNotice
         $notice->render();
     }
 
-    public static function render_notice(string $text, string $type = 'success', bool $hasButton = false, string $buttonLink, string $buttonClass = '', string $buttonText = '', bool $linkInNewTab = true, string $buttonSubText = '', string $noticeBEMClass = 'dp-notice', ?string $id = null, string $noticeExtraClass = '')
+    public static function render_notice(string $text, string $type = 'success', bool $hasButton = false, string $buttonLink = '', string $buttonClass = '', string $buttonText = '', bool $linkInNewTab = true, string $buttonSubText = '', string $noticeBEMClass = 'dp-notice', ?string $id = null, string $noticeExtraClass = '')
     {
         self::render_raw_notice([
             new Element('p', 'text', null, $text),
