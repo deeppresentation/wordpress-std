@@ -158,7 +158,6 @@ class WpStd
         $res = null;
         if ($post_url_path)
         {
-            $site_url = get_site_url();
             $post_url_path = Str::separed_first_part($post_url_path, '?');
             $post_url_path = Str::separed_first_part($post_url_path, '#');
             $post_url_path_trimmed = trim($post_url_path, '/');
