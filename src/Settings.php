@@ -36,6 +36,17 @@ class Settings
         return $def;  
     }
 
+    public static function first_init_for_public($optionId, $optionConfig){
+        $options = get_option($optionId, null);          
+        if (is_null($options) || (\is_array($options) && !\count($options))) {
+            $val = [];
+            foreach ($optionConfig as $item){
+                $val[ $item['id']] = $item['defVal'] ?? ''; 
+            }    
+            add_option($optionId, $val); 
+        }
+    }
+
     public static function init_setting_array(string $optionId, string $sectionId, string $sectionTitle, string $textDomain,
         string $page, array $fields = [], $renderDescriptionClb = null, bool $cleanNotSupportedFields = true)
     {
