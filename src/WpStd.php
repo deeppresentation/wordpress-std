@@ -158,21 +158,24 @@ class WpStd
         $res = null;
         if ($post_url_path)
         {
+            $site_url = get_site_url();
             $post_url_path = Str::separed_first_part($post_url_path, '?');
             $post_url_path = Str::separed_first_part($post_url_path, '#');
             $post_url_path_trimmed = trim($post_url_path, '/');
-            if (empty($post_url_path_trimmed)) $post_url_path = get_site_url();
+            if (is_front_page() || empty($post_url_path_trimmed)){
+                $post_url_path = get_site_url();
+            }
             $res = get_page_by_path( $post_url_path, OBJECT, $post_type);
             if (!$res) {
                 $id = url_to_postid( $post_url_path );
                 if ($id) $res = get_post($id);
             }
+            
         }
         return $res;
     }
 
     public static function get_post_ID_from_SERVER_REQ_URL( $post_type = ['page', 'post']) {
-
         $currentPost = self::get_post_by_url_path($_SERVER['REQUEST_URI'], $post_type);
         if ($currentPost) {
             return $currentPost->ID;
