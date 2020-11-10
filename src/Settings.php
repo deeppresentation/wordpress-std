@@ -169,7 +169,11 @@ class Settings
         $hidden = Arr::sget($args, 'hidden', false);
         $disabled = Arr::sget($args, 'disabled', '0') == '1';
         $readonly = Arr::sget($args, 'readonly', '0') == '1';    
-        
+        $hint = Arr::get($args, 'hint');
+        $style = [];
+        if ($hint) $style = [
+            'margin-right' => '10px'
+        ];
 
         if (!$hidden)
         {
@@ -178,7 +182,7 @@ class Settings
             {
             case 'text':
                     $inputType =  Arr::sget($args, 'inputType', 'text'); 
-                    Html::render('input', null, null, null, [
+                    Html::render('input', null, $style, null, [
                         'type' => $inputType,
                         'id' => $id,
                         'name' => $page.'[' . $name . ']',
@@ -191,7 +195,7 @@ class Settings
                     ]);
                 break;
                 case 'checkbox':
-                    Html::render('input', null, null, null, [
+                    Html::render('input', null, $style, null, [
                         'type' => 'checkbox',
                         'id' => $id,
                         'name' => $page.'[' . $name . ']',
@@ -205,7 +209,7 @@ class Settings
                     ]);
                     break;
                 case 'textarea':   
-                    Html::render('textarea', null, null, $value, [
+                    Html::render('textarea', null, $style, $value, [
                         'id' => $id,
                         'name' => $page.'[' . $name . ']',
                         'cols' => $size,
@@ -238,9 +242,23 @@ class Settings
                         'title' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
                         'readonly' => $readonly ? "readonly" : null,
+                        'style' => $style
                     ], $optionsHtml);
                     $select->render();
                     break;
+            }
+
+            if ($hint){
+                Html::render('span', 'dp-settings-hint', [
+                    'margin-right' => '20px',
+                    'font-style' => 'italic',
+                    'font-weight' => '300',
+                    'font-size' => '12px'
+                    
+                    ], $hint, [
+                    'disabled' => $disabled ? "disabled" : null,
+                    'readonly' => $readonly ? "readonly" : null,
+                ]);
             }
         }
     }
