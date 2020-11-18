@@ -169,11 +169,13 @@ class Settings
         $hidden = Arr::sget($args, 'hidden', false);
         $disabled = Arr::sget($args, 'disabled', '0') == '1';
         $readonly = Arr::sget($args, 'readonly', '0') == '1';    
+        $proOnly = Arr::sget($args, 'pro_only', '0') == '1'; 
         $hint = Arr::get($args, 'hint');
         $style = [];
         if ($hint) $style = [
             'margin-right' => '10px'
         ];
+        $classes = $proOnly ? ['dp-intro-tour-option-pro-only'] : [];
 
         if (!$hidden)
         {
@@ -182,7 +184,7 @@ class Settings
             {
             case 'text':
                     $inputType =  Arr::sget($args, 'inputType', 'text'); 
-                    Html::render('input', null, $style, null, [
+                    Html::render('input', $classes, $style, null, [
                         'type' => $inputType,
                         'id' => $id,
                         'name' => $page.'[' . $name . ']',
@@ -195,7 +197,7 @@ class Settings
                     ]);
                 break;
                 case 'checkbox':
-                    Html::render('input', null, $style, null, [
+                    Html::render('input', $classes, $style, null, [
                         'type' => 'checkbox',
                         'id' => $id,
                         'name' => $page.'[' . $name . ']',
@@ -209,7 +211,7 @@ class Settings
                     ]);
                     break;
                 case 'textarea':   
-                    Html::render('textarea', null, $style, $value, [
+                    Html::render('textarea', $classes, $style, $value, [
                         'id' => $id,
                         'name' => $page.'[' . $name . ']',
                         'cols' => $size,
@@ -237,6 +239,7 @@ class Settings
                     }
                     $select = new Element('select', null, [
                         'id' => $id,
+                        'class' => $classes,
                         'name' => $page.'[' . $name . ']',
                         'placeholder' => $placeholder,
                         'title' => $placeholder,
@@ -247,9 +250,9 @@ class Settings
                     $select->render();
                     break;
             }
-
+            $classes[] = 'dp-settings-hint';
             if ($hint){
-                Html::render('span', 'dp-settings-hint', [
+                Html::render('span', $classes, [
                     'margin-right' => '20px',
                     'font-style' => 'italic',
                     'font-weight' => '300',
