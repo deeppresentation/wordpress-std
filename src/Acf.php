@@ -179,9 +179,9 @@ class Acf
         }
     }
 
-    public static function get_group_field(string $groupId, string $fieldId, ?int $postId = null, $def = null ){
+    public static function get_group_field(string $groupId, string $fieldId, ?int $postId = null, $def = null, $formatValue = false ){
         if (!$postId) $postId = get_the_ID();
-        $res = get_field($groupId . '_' . $fieldId, $postId, false);
+        $res = get_field($groupId . '_' . $fieldId, $postId, $formatValue);
         if (!isset($res)) return $def;
         return $res;
     }
