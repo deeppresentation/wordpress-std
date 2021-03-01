@@ -13,9 +13,9 @@ class AdminPromo
         Settings::update_setting_array($optionsGroup, $optionId, $now->getTimestamp(), true);
     }
 
-    public static function set_a4r_state(string $optionsGroup, bool $reset = false, string $optionId = 'a4r-already')
+    public static function set_a4r_state( string $cookieName, bool $reset = false,  int $days = 30)
     {
-        Settings::update_setting_array($optionsGroup, $optionId, !$reset, true);
+        setcookie($cookieName, $reset ? '0' : '1', time() + (86400 * $days), "/"); // 86400 = 1 day
     }
 
     public static function reset_promo_states(string $optionsGroup, string $timeOptionId = 'activated_time')
@@ -37,9 +37,10 @@ class AdminPromo
         return $def;
     }
 
-    public static function is_right_time_for_ask_4_rating(float $minDaysActivated, string $optionsGroup, string $timeOptionId = 'activated_time', string $a4rOptionId = 'a4r-already'){
+    public static function is_right_time_for_ask_4_rating(float $minDaysActivated, string $a4rCookieName, string $optionsGroup, string $timeOptionId = 'activated_time'){
         $options = get_option($optionsGroup, []);
-        if (!Arr::get($options, $a4rOptionId, false))
+        $a4r_already = $_COOKIE[$a4rCookieName];
+        if ($a4r_already != '1')
         {
             return self::is_activated_more_then_days($optionsGroup, $minDaysActivated, false, $timeOptionId);
         }
