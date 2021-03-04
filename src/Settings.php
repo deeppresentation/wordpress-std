@@ -175,7 +175,11 @@ class Settings
         if ($hint) $style = [
             'margin-right' => '10px'
         ];
-        $classes = $proOnly ? ['dp-intro-tour-option-pro-only'] : [];
+        $classes = ['dp-settings__el'];
+        if ($proOnly){ 
+            $readonly = true;
+            $classes[] = 'dpit-pro-only';
+        }
 
         if (!$hidden)
         {
@@ -191,7 +195,6 @@ class Settings
                         'value' => $value,
                         'size' => $size,
                         'placeholder' => $placeholder,
-                        'title' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
                         'readonly' => $readonly ? "readonly" : null,
                     ]);
@@ -206,8 +209,7 @@ class Settings
                         'disabled' => $disabled ? "disabled" : null,
                         'readonly' => $readonly ? "readonly" : null,
                         'size' => $size,
-                        'placeholder' => $placeholder,
-                        'title' => $placeholder
+                        'placeholder' => $placeholder
                     ]);
                     break;
                 case 'textarea':   
@@ -217,7 +219,6 @@ class Settings
                         'cols' => $size,
                         'rows' => Arr::sget($args, 'rowCnt', 5),
                         'placeholder' => $placeholder,
-                        'title' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
                         'readonly' => $readonly ? "readonly" : null,
                         //'$1' => 'readonly'
@@ -242,7 +243,6 @@ class Settings
                         'class' => $classes,
                         'name' => $page.'[' . $name . ']',
                         'placeholder' => $placeholder,
-                        'title' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
                         'readonly' => $readonly ? "readonly" : null,
                         'style' => $style
@@ -250,14 +250,13 @@ class Settings
                     $select->render();
                     break;
             }
-            $classes[] = 'dp-settings-hint';
+            $classes[] = 'dp-settings__el__hint';
             if ($hint){
                 Html::render('span', $classes, [
                     'margin-right' => '20px',
                     'font-style' => 'italic',
                     'font-weight' => '300',
-                    'font-size' => '12px'
-                    
+                    'font-size' => '12px'                 
                     ], $hint, [
                     'disabled' => $disabled ? "disabled" : null,
                     'readonly' => $readonly ? "readonly" : null,
