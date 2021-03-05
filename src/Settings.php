@@ -176,9 +176,17 @@ class Settings
             'margin-right' => '10px'
         ];
         $classes = ['dp-settings__el'];
+        $classes_hint = ['dp-settings__el__hint'];
         if ($proOnly){ 
             $readonly = true;
             $classes[] = 'dpit-pro-only';
+            $classes_hint[] = 'dpit-pro-only';
+        }
+
+        if ($type === 'color'){
+            $type = 'text';
+            $classes[] = 'dp-color-picker-field';
+            
         }
 
         if (!$hidden)
@@ -250,9 +258,8 @@ class Settings
                     $select->render();
                     break;
             }
-            $classes[] = 'dp-settings__el__hint';
             if ($hint){
-                Html::render('span', $classes, [
+                Html::render('span', $classes_hint, [
                     'margin-right' => '20px',
                     'font-style' => 'italic',
                     'font-weight' => '300',
