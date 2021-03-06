@@ -132,7 +132,8 @@ class WpStd
      *
      * @return mixed boolean false if no post exists; post ID otherwise.
      */
-    public static function post_exists_by_slug( $post_slug, $post_type = 'post') {
+    public static function post_exists_by_slug( $post_slug, $post_type = null) {
+        if (!$post_type) $post_type = get_post_types();
         $args = array(
             'name'        => $post_slug,
             'post_type'   => $post_type,
@@ -154,8 +155,9 @@ class WpStd
      *
      * @return mixed boolean false if no post exists; post ID otherwise.
      */
-    public static function get_post_by_url_path( $post_url_path, $post_type = ['page', 'post']) {
+    public static function get_post_by_url_path( $post_url_path, $post_type = null) {
         $res = null;
+        
         if ($post_url_path)
         {
             $post_url_path = Str::separed_first_part($post_url_path, '?');
@@ -164,6 +166,7 @@ class WpStd
             if (is_front_page() || empty($post_url_path_trimmed)){
                 $post_url_path = get_site_url();
             }
+            if (!$post_type) $post_type = array_values(get_post_types([ 'public' => true]));
             $res = get_page_by_path( $post_url_path, OBJECT, $post_type);
             if (!$res) {
                 $id = url_to_postid( $post_url_path );
@@ -174,12 +177,46 @@ class WpStd
         return $res;
     }
 
-    public static function get_post_ID_from_SERVER_REQ_URL( $post_type = ['page', 'post']) {
+    
+    public static function experimental_url_to_postid( $url ) {
+        // Try the core function
+        $post_id = url_to_postid( $url );
+        if ( $post_id == 0 ) {
+            // Try custom post types
+            $cpts = get_post_types( array(
+                'public'   => true,
+                '_builtin' => false
+            ), 'objects', 'and' );
+            // Get path from URL
+            //$url_parts = explode( '/', trim( $url, '/' ) );
+            //$url_parts = array_splice( $url_parts, 3 );
+            $path = $url;//implode( '/', $url_parts );
+            // Test against each CPT's rewrite slug
+            foreach ( $cpts as $cpt_name => $cpt ) {
+                $cpt_slug = trim($cpt->rewrite['slug'], '/') ;
+                if ($cpt_slug){
+                    if ( strlen( $path ) > strlen( $cpt_slug ) && substr( $path, 0, strlen( $cpt_slug ) ) == $cpt_slug ) {
+                        $slug = substr( $path, strlen( $cpt_slug ) );
+                        $query = new WP_Query( array(
+                            'post_type'         => $cpt_name,
+                            'name'              => $slug,
+                            'posts_per_page'    => 1
+                        ));
+                        if ( is_object( $query->post ) )
+                            $post_id = $query->post->ID;
+                    }
+                }
+            }
+        }
+        return $post_id;
+    }
+
+    public static function get_post_ID_from_SERVER_REQ_URL($post_type = null, $fallback_id = null) {
         $currentPost = self::get_post_by_url_path($_SERVER['REQUEST_URI'], $post_type);
         if ($currentPost) {
             return $currentPost->ID;
         }
-        return null;
+        return $fallback_id;
     }
 
 
