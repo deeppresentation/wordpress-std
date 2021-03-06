@@ -178,7 +178,7 @@ class WpStd
     }
 
     
-    public static function experimental_url_to_postid( $url ) {
+    public static function get_post_by_url_( $url ) {
         // Try the core function
         $post_id = url_to_postid( $url );
         if ( $post_id == 0 ) {
@@ -221,6 +221,13 @@ class WpStd
 
 
 
+    public static function get_current_url($trimQueryParams = false){
+        $request_uri = $_SERVER['REQUEST_QUERY'];
+        if ($trimQueryParams && \array_key_exists('REQUEST_QUERY', $_SERVER) && $_SERVER['REQUEST_QUERY']){
+            $request_uri = str_replace( $_SERVER['REQUEST_QUERY'], '', $_SERVER['REQUEST_URI'] );
+        }
+        return ( is_ssl() ? 'https' : 'http' ) . '://' . $_SERVER['HTTP_HOST'] . $request_uri;
+    }
 
 
 
