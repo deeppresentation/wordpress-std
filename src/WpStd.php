@@ -222,7 +222,7 @@ class WpStd
 
 
     public static function get_current_url($trimQueryParams = false){
-        $request_uri = $_SERVER['REQUEST_QUERY'];
+        $request_uri = $_SERVER['REQUEST_URI'];
         if ($trimQueryParams && \array_key_exists('REQUEST_QUERY', $_SERVER) && $_SERVER['REQUEST_QUERY']){
             $request_uri = str_replace( $_SERVER['REQUEST_QUERY'], '', $_SERVER['REQUEST_URI'] );
         }
