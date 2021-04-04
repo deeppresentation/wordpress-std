@@ -196,7 +196,7 @@ class Settings
             {
             case 'text':
                     $inputType =  Arr::sget($args, 'inputType', 'text'); 
-                    Html::render('input', $classes, $style, null, [
+                    $attrs = [
                         'type' => $inputType,
                         'id' => $id,
                         'name' => $page.'[' . $name . ']',
@@ -205,7 +205,14 @@ class Settings
                         'placeholder' => $placeholder,
                         'disabled' => $disabled ? "disabled" : null,
                         'readonly' => $readonly ? "readonly" : null,
-                    ]);
+                    ];
+                    if ($inputType === 'number'){
+                        $min = Arr::get($args, 'min');
+                        if ($min || $min === 0 || $min === '0') $attrs['min'] = $min;
+                        $max = Arr::get($args, 'max');
+                        if ($max || $max === 0 || $max === '0') $attrs['max'] = $max;
+                    }
+                    Html::render('input', $classes, $style, null, $attrs);
                 break;
                 case 'checkbox':
                     Html::render('input', $classes, $style, null, [
