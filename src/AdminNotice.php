@@ -42,7 +42,7 @@ class AdminNotice
         return $text;
     }
 
-    public static function render_ask_for_rating_notice(int $activeWeeks, string $productName, string $linkForRating, string $textDomain, string $imgUrl = null, string $imgAlt = 'Dp Intro Tour Rating Image')
+    public static function render_ask_for_rating_notice(int $activeWeeks, string $productName, string $linkForRating, string $textDomain, string $notice_id = 'a4r-notice', string $imgUrl = null, string $imgAlt = '')
     {
         $text = self::get_ask_for_rating_text($activeWeeks, $productName, $textDomain);
         AdminNotice::render_raw_notice(\array_filter([
@@ -52,7 +52,7 @@ class AdminNotice
                 new Element('a', 'link', ['href' => '#', 'id'=>'a4r-link-already-did'], __('I already did', $textDomain), 'already-did'),
                 new Element('a', 'link', ['href' => '#', 'id'=>'a4r-link-no-good'], __('No, not good enough', $textDomain), 'no-good')
             ]),
-            'success', 'dp-notice', 'a4r-notice'
+            'success', 'dp-notice', $notice_id
         );
     }
 

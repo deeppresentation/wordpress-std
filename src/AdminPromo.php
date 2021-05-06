@@ -47,8 +47,8 @@ class AdminPromo
         return false;
     }
 
-    public static function is_right_time_for_random(float $minDaysActivated, int $randomChance, string $optionsGroup, string $pressedFlagId = '',  string $timeOptionId = 'activated_time'){
-        if (empty($pressedFlagId) || !Settings::get_setting_array_field($optionsGroup, $pressedFlagId, false))
+    public static function is_right_time_for_random(float $minDaysActivated, int $randomChance, string $optionsGroup, string $pressedFlagCookieName = '',  string $timeOptionId = 'activated_time'){
+        if (empty($pressedFlagCookieName) ||  $_COOKIE[$pressedFlagCookieName] != '1')
         {
             if (self::is_activated_more_then_days($optionsGroup, $minDaysActivated, false, $timeOptionId))
             {
