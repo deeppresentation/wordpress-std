@@ -26,16 +26,25 @@ class AdminPromo
 
     public static function is_activated_more_then_days(string $optionsGroup, float $days, bool $def = false, string $optionId = 'activated_time')
     {
+        $diffDays = self::get_activated_days($optionsGroup, null);
+        if ($diffDays) return $diffDays > $days;
+        else return $def;
+    }
+
+    public static function get_activated_days(string $optionsGroup, $def = 0, string $optionId = 'activated_time')
+    {
         $activated_time = (int)Settings::get_setting_array_field($optionsGroup, $optionId, null);
         if ($activated_time)
         {
             $now = (new \DateTime("now"))->getTimestamp();
             $diffSec = $now - $activated_time;
             $diffDays = $diffSec / 60 / 60 / 24;
-            return $diffDays > $days;
+            return $diffDays;
         }
         return $def;
     }
+
+
 
     public static function is_right_time_for_ask_4_rating(float $minDaysActivated, string $a4rCookieName, string $optionsGroup, string $timeOptionId = 'activated_time'){
         $options = get_option($optionsGroup, []);

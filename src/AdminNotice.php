@@ -34,8 +34,9 @@ class AdminNotice
 
     public static function get_ask_for_rating_text(int $activeWeeks, string $productName, string $textDomain, $add_greeting_at_the_end = true){
         $plugin_name = '<strong>' . $productName . '</strong>';
-        $weeksText = sprintf(esc_html(_n("%d week", "%d weeks", $activeWeeks, $textDomain)), $activeWeeks);
-        $text = sprintf(__("Awesome, you've been using %s for more then %s.<br>Nice rating helps us grow, so we can <strong>serve you better</strong> via our support and develop <strong>new cool features</strong> into this free product.<br>We would really appreciate Your help. It takes just one minute. Thank You:)<br>", $textDomain), $plugin_name, $weeksText);
+        if ($activeWeeks > 16) $time_in_use_text = sprintf(esc_html(_n("%d month", "%d months", floor($activeWeeks / 4), $textDomain)), floor($activeWeeks / 4));
+        else $time_in_use_text = sprintf(esc_html(_n("%d week", "%d weeks", $activeWeeks, $textDomain)), $activeWeeks);
+        $text = sprintf(__("Amazing, you've been using the %s for over %s.<br>Nice rating helps us grow, so we can <strong>serve you better</strong> via our support and develop <strong>new cool features</strong> into this free product.<br>We really appreciate Your help. It takes just one minute. Thank You:)<br>", $textDomain), $plugin_name, $time_in_use_text);
         if ($add_greeting_at_the_end){
             $text .= __("<strong>Your DeepPresentation Team</strong>", $textDomain); 
         }
