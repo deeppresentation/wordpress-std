@@ -49,7 +49,8 @@ class AdminNotice
         AdminNotice::render_raw_notice(\array_filter([
                 ($imgUrl) ? new Element('img', 'img', ['src' => $imgUrl, 'alt' => $imgAlt, 'class' => 'dp-intro-tour-a4r-5star-img'], null, null, false) : null,
                 new Element('p', 'text', null, $text),
-                new Element('a', 'link', ['href' => $linkForRating, 'target' => '_blank', 'id'=>'a4r-link-OK'], __('OK, you deserved it', $textDomain)),
+                new Element('a', 'link', ['href' => $linkForRating, 'target' => '_blank', 'id'=>'a4r-link-OK', 'class' => 'button button-primary button-pro-promo'], __('OK, you deserved it', $textDomain)),
+                '<br>',
                 new Element('a', 'link', ['href' => '#', 'id'=>'a4r-link-already-did'], __('I already did', $textDomain), 'already-did'),
                 new Element('a', 'link', ['href' => '#', 'id'=>'a4r-link-no-good'], __('No, not good enough', $textDomain), 'no-good')
             ]),
