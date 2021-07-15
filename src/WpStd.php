@@ -197,7 +197,7 @@ class WpStd
                 if ($cpt_slug){
                     if ( strlen( $path ) > strlen( $cpt_slug ) && substr( $path, 0, strlen( $cpt_slug ) ) == $cpt_slug ) {
                         $slug = substr( $path, strlen( $cpt_slug ) );
-                        $query = new WP_Query( array(
+                        $query = new \WP_Query( array(
                             'post_type'         => $cpt_name,
                             'name'              => $slug,
                             'posts_per_page'    => 1

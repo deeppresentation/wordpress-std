@@ -182,7 +182,7 @@ class Acf
     public static function get_group_field(string $groupId, string $fieldId, ?int $postId = null, $def = null, $formatValue = false ){
         if (!$postId) $postId = get_the_ID();
         $res = get_field($groupId . '_' . $fieldId, $postId, $formatValue);
-        if (!isset($res)) return $def;
+        if (!isset($res)) return Arr::get(\acf_get_field($fieldId),'default_value', $def);
         return $res;
     }
 
