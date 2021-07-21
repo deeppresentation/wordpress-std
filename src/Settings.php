@@ -156,6 +156,24 @@ class Settings
         
     }
 
+    public static function render_hint($hint, $proOnly, $disabled, $readonly){
+        if ($hint){
+            $classes_hint = ['dp-settings__el__hint'];
+            if ($proOnly){ 
+                $classes_hint[] = 'dpit-pro-only';
+            }
+            Html::render('span', $classes_hint, [
+                'margin-right' => '20px',
+                'font-style' => 'italic',
+                'font-weight' => '300',
+                'font-size' => '12px'                 
+                ], $hint, [
+                'disabled' => $disabled ? "disabled" : null,
+                'readonly' => $readonly ? "readonly" : null,
+            ]);
+        }
+    }
+
 
     public static function render_option(array $args)
     {
@@ -176,11 +194,9 @@ class Settings
             'margin-right' => '10px'
         ];
         $classes = ['dp-settings__el'];
-        $classes_hint = ['dp-settings__el__hint'];
         if ($proOnly){ 
             $readonly = true;
             $classes[] = 'dpit-pro-only';
-            $classes_hint[] = 'dpit-pro-only';
         }
 
         if ($type === 'color'){
@@ -194,7 +210,7 @@ class Settings
             $id = implode('-', [$page, $type, $name]);
             switch ($type)
             {
-            case 'text':
+                case 'text':
                     $inputType =  Arr::sget($args, 'inputType', 'text'); 
                     $attrs = [
                         'type' => $inputType,
@@ -239,6 +255,17 @@ class Settings
                         //'$1' => 'readonly'
                     ]);
                     break;
+                case 'action':   
+                        $action = Arr::sget($args, 'name', '');
+                        Html::render('div', 'button dp-intro-admin-edit-btn dp-intro-admin-edit-btn--settings', null, 
+                            Html::get_str('span', 'dp-intro-admin-edit-btn__text', null, Arr::sget($args, 'title', $action)) , [
+                            'data-msg-success' => Arr::sget($args, 'msg_success', ''),
+                            'data-msg-failed' => Arr::sget($args, 'msg_failed', ''),
+                            'data-orig-title' => Arr::sget($args, 'title', $action),
+                            'id' => 'dpit_action_' . $action,
+                            'data-action' => $action
+                        ]);
+                    break;
                 case 'select':
                     $options = Arr::get($args, 'options', []);
                     $optionsHtml = [];
@@ -265,17 +292,7 @@ class Settings
                     $select->render();
                     break;
             }
-            if ($hint){
-                Html::render('span', $classes_hint, [
-                    'margin-right' => '20px',
-                    'font-style' => 'italic',
-                    'font-weight' => '300',
-                    'font-size' => '12px'                 
-                    ], $hint, [
-                    'disabled' => $disabled ? "disabled" : null,
-                    'readonly' => $readonly ? "readonly" : null,
-                ]);
-            }
+            self::render_hint($hint, $proOnly, $disabled, $readonly);
         }
     }
 }
