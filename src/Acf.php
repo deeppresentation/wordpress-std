@@ -182,7 +182,50 @@ class Acf
     public static function get_group_field(string $groupId, string $fieldId, ?int $postId = null, $def = null, $formatValue = false ){
         if (!$postId) $postId = get_the_ID();
         $res = get_field($groupId . '_' . $fieldId, $postId, $formatValue);
-        if (!isset($res)) return Arr::get(\acf_get_field($fieldId),'default_value', $def);
+        if (!isset($res)) return self::get_field_def_val($fieldId, $formatValue, $def);
+        return $res;
+    }
+
+    public static function get_field_def_val(string $fieldId, $formatValue = false, $def = null){
+        $field_cfg = \acf_get_field($fieldId);
+        if ($field_cfg){
+            $type = Arr::get($field_cfg, 'type', $def);
+            if ($type === 'group'){
+                $res = [];
+                $sub_fields = Arr::get($field_cfg, 'sub_fields', null);
+                if ($sub_fields){
+                    foreach ($sub_fields as $sub_field){
+                        $name = Arr::get($sub_field, 'name', null);
+                        if ($name){
+                            $val = Arr::get($sub_field, 'default_value');
+                            if (isset($val) && $formatValue){
+                                $val =  apply_filters('acf/format_value', $val, null, $sub_field);
+                            }
+                            $res[$name] = $val;
+                        }
+                    }
+                }
+                return $res;
+            }
+            else{
+                $val = Arr::get($field_cfg,'default_value');
+                if (isset($val)){
+                    if ($formatValue) $val = apply_filters('acf/format_value', $val, null, $field_cfg);
+                    return $val;
+                }
+                else return $def;
+            } 
+            return apply_filters('acf/format_value', Arr::get($field_cfg,'default_value'));
+        }
+        return $def;
+    }
+
+    public static function get_field(string $fieldId, ?int $postId = null, $formatValue = false, $def = null){
+        if (!$postId) $postId = get_the_ID();
+        $res = get_field($fieldId, $postId, $formatValue);
+        if (!isset($res)){
+            return self::get_field_def_val($fieldId, $formatValue, $def);
+        } 
         return $res;
     }
 
