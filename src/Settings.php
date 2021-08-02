@@ -36,6 +36,33 @@ class Settings
         return $def;  
     }
 
+    public static function get_user_data( $key, $sub_key, $user_id, $def)
+    {
+        $specific_options = self::get_setting_array_field($key, $sub_key, []);
+        return Arr::get($specific_options, $user_id, $def);
+    }
+
+    public static function update_user_data( $key, $sub_key, $user_id, $val)
+    {
+        $specific_options = self::get_setting_array_field($key, $sub_key, []);
+        $specific_options[$user_id] = $val;
+        self::update_setting_array( $key, $sub_key, $specific_options, true);
+    }
+
+    public static function delete_user_data($key, $sub_key, $user_id = null)
+    {
+        if (!$user_id){
+            $options = get_option($key, []);
+            if (array_key_exists($sub_key, $options)){
+                $options[$sub_key] = [];
+                update_option($key, $options);
+            }
+        }
+        else{
+            self::update_user_data($key, $sub_key, $user_id, null);
+        }
+    }
+
     public static function first_init_for_public($optionId, $optionConfig){
         $options = get_option($optionId, null);          
         if (is_null($options) || (\is_array($options) && !\count($options))) {
