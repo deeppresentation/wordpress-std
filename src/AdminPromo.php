@@ -47,8 +47,8 @@ class AdminPromo
 
 
     public static function is_right_time_for_ask_4_rating(float $minDaysActivated, string $a4rCookieName, string $optionsGroup, string $timeOptionId = 'activated_time'){
-        $options = get_option($optionsGroup, []);
-        $a4r_already = $_COOKIE[$a4rCookieName];
+        //$options = get_option($optionsGroup, []);
+        $a4r_already = Arr::get($_COOKIE, $a4rCookieName, '0');
         if ($a4r_already != '1')
         {
             return self::is_activated_more_then_days($optionsGroup, $minDaysActivated, false, $timeOptionId);
@@ -57,7 +57,7 @@ class AdminPromo
     }
 
     public static function is_right_time_for_random(float $minDaysActivated, int $randomChance, string $optionsGroup, string $pressedFlagCookieName = '',  string $timeOptionId = 'activated_time'){
-        if (empty($pressedFlagCookieName) ||  $_COOKIE[$pressedFlagCookieName] != '1')
+        if (empty($pressedFlagCookieName) || Arr::get($_COOKIE, $pressedFlagCookieName, '0'))
         {
             if (self::is_activated_more_then_days($optionsGroup, $minDaysActivated, false, $timeOptionId))
             {
