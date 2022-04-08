@@ -132,13 +132,13 @@ class Settings {
 	}
 
 	public static function add_settings_field( string $id, string $title, string $defVal, string $page,
-		string $section, array $options, array $renderArgs = [], string $optionId = null ) {
-		/*if ( ! array_key_exists( $id, $options ) ) {
+		string $section, array &$options, array $renderArgs = [], string $optionId = null ) {
+		if ( ! array_key_exists( $id, $options ) ) {
 			$options[ $id ] = $defVal;
 			if ( ! empty( $optionId ) ) {
 				update_option( $optionId, $options );
 			}
-		}*/
+		}
 		if ( ! array_key_exists( 'placeholder', $renderArgs ) ) {
 			$renderArgs['placeholder'] = $defVal;
 		}
