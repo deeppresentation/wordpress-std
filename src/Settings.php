@@ -9,7 +9,7 @@ class Settings {
 
 	public static function append_to_option( string $optionId, string $valueToAppend ) {
 		$currentVal = get_option( $optionId );
-		if ( $currentVal != false ) {
+		if ( $currentVal !== false ) {
 
 			update_option( $optionId, $currentVal . $valueToAppend );
 		}
@@ -35,6 +35,11 @@ class Settings {
 		return $def;
 	}
 
+	public static function get_setting_array_bool( string $optionId, string $optionSubFieldId, bool $def = false ) {
+		return self::get_setting_array_field( $optionId, $optionSubFieldId, $def ) === '1';
+	}
+
+
 	public static function get_user_data( $key, $sub_key, $user_id, $def ) {
 		$specific_options = self::get_setting_array_field( $key, $sub_key, [] );
 		return Arr::get( $specific_options, $user_id, $def );
@@ -57,6 +62,8 @@ class Settings {
 			self::update_user_data( $key, $sub_key, $user_id, null );
 		}
 	}
+
+
 
 	public static function first_init_for_public( $optionId, $optionConfig ) {
 		$options = get_option( $optionId, null );
