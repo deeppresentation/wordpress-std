@@ -337,6 +337,15 @@ class Settings {
 					);
 					$select->render();
 					break;
+
+				case 'description':
+					$desc_content = Arr::sget( $args, 'desc_content', '' );
+					$classes[]    = 'dp-settings__el--desc';
+					if ( $desc_content ) {
+						Html::render( 'div', $classes, $style, $desc_content );
+
+					}
+					break;
 			}
 			self::render_hint( $hint, $proOnly, $disabled, $readonly );
 		}
