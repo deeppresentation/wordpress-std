@@ -7,19 +7,19 @@ use DP\Std\Core\Arr;
 class AdminNotice {
 
 	public static function render_raw_notice( $htmlContent, string $type = 'success', string $noticeBEMClass = 'dp-notice', ?string $id = null, string $noticeExtraClass = '' ) {
-		$clases = array(
+		$clases = [
 			"notice notice-${type}",
 			'is-dismissible',
 			$noticeExtraClass,
-		);
+		];
 
 		$notice = new Element(
 			'div',
 			$noticeBEMClass,
-			array(
+			[
 				'class' => Arr::as_string( $clases, ' ' ),
 				'id'    => $id,
-			),
+			],
 			$htmlContent
 		);
 		$notice->render();
@@ -27,19 +27,19 @@ class AdminNotice {
 
 	public static function render_notice( string $text, string $type = 'success', bool $hasButton = false, string $buttonLink = '', string $buttonClass = '', string $buttonText = '', bool $linkInNewTab = true, string $buttonSubText = '', string $noticeBEMClass = 'dp-notice', ?string $id = null, string $noticeExtraClass = '' ) {
 		self::render_raw_notice(
-			array(
+			[
 				new Element( 'p', 'text', null, $text ),
 				( ! $hasButton ) ? null : new Element(
 					'a',
 					'button',
-					array(
+					[
 						'class'  => $buttonClass,
 						'href'   => $buttonLink,
 						'target' => ( $linkInNewTab ) ? '_blank' : '',
-					),
-					array( $buttonText, ! empty( $buttonSubText ) ? new Element( 'span', 'sub-text', null, $buttonSubText ) : null )
+					],
+					[ $buttonText, ! empty( $buttonSubText ) ? new Element( 'span', 'sub-text', null, $buttonSubText ) : null ]
 				),
-			),
+			],
 			$type,
 			$noticeBEMClass,
 			$id,
@@ -61,19 +61,19 @@ class AdminNotice {
 		return $text;
 	}
 
-	public static function render_ask_for_rating_notice( int $activeWeeks, string $productName, string $linkForRating, string $textDomain, string $notice_id = 'a4r-notice', string $imgUrl = null, string $imgAlt = '' ) {
+	public static function render_ask_for_rating_notice( int $activeWeeks, string $productName, string $linkForRating, string $textDomain, string $notice_id = 'a4r-notice', string $imgUrl = null, string $imgAlt = '', string $notice_class = 'dp-notice' ) {
 		$text = self::get_ask_for_rating_text( $activeWeeks, $productName, $textDomain );
 		AdminNotice::render_raw_notice(
 			\array_filter(
-				array(
+				[
 					( $imgUrl ) ? new Element(
 						'img',
 						'img',
-						array(
+						[
 							'src'   => $imgUrl,
 							'alt'   => $imgAlt,
 							'class' => 'dp-intro-tour-a4r-5star-img',
-						),
+						],
 						null,
 						null,
 						false
@@ -82,39 +82,39 @@ class AdminNotice {
 					new Element(
 						'a',
 						'link',
-						array(
+						[
 							'href'   => $linkForRating,
 							'target' => '_blank',
 							'id'     => 'a4r-link-OK',
 							'class'  => 'button button-primary button-pro-promo',
-						),
+						],
 						__( 'OK, you deserved it', $textDomain )
 					),
 					'<br>',
 					new Element(
 						'a',
 						'link',
-						array(
+						[
 							'href' => '#',
 							'id'   => 'a4r-link-already-did',
-						),
+						],
 						__( 'I already did', $textDomain ),
 						'already-did'
 					),
 					new Element(
 						'a',
 						'link',
-						array(
+						[
 							'href' => '#',
 							'id'   => 'a4r-link-no-good',
-						),
+						],
 						__( 'No, not good enough', $textDomain ),
 						'no-good'
 					),
-				)
+				]
 			),
 			'success',
-			'dp-notice',
+			$notice_class,
 			$notice_id
 		);
 	}
