@@ -64,6 +64,18 @@ class Settings {
 	}
 
 
+	public static function migrate_option_array_field( string $old_option_id, string $new_option_id, $old_option_def = false, string $old_option_sub_id = '', string $new_option_sub_id = '' ) {
+		if ( $old_option_id && $new_option_id ) {
+			$val = $old_option_sub_id ? self::get_setting_array_bool( $old_option_id, $old_option_sub_id, $old_option_def ) : get_option( $old_option_id );
+			if ( ! $new_option_sub_id ) {
+				update_option( $new_option_id, $val );
+			} else {
+				self::update_setting_array( $new_option_id, $new_option_sub_id, $val, true );
+			}
+		}
+	}
+
+
 
 	public static function first_init_for_public( $optionId, $optionConfig ) {
 		$options = get_option( $optionId, null );
@@ -77,7 +89,7 @@ class Settings {
 	}
 
 	public static function init_setting_array( string $optionId, string $sectionId, string $sectionTitle,
-		string $page, array $fields = [], $renderDescriptionClb = null, bool $cleanNotSupportedFields = true ) {
+		string $page, array $fields = [], $renderDescriptionClb = null, bool $cleanNotSupportedFields = false ) {
 		$options = get_option( $optionId, null );
 		if ( is_null( $options ) ) {
 			if ( add_option( $optionId, [] ) ) {
@@ -100,7 +112,7 @@ class Settings {
 	}
 
 	public static function add_settings_section( string $sectionId, string $title, array $options,
-		string $page, array $fields = [], $renderDescriptionClb = null, bool $cleanNotSupportedFields = true, string $optionId = '' ) {
+		string $page, array $fields = [], $renderDescriptionClb = null, bool $cleanNotSupportedFields = false, string $optionId = '' ) {
 		add_settings_section(
 			$sectionId,                     // ID used to identify this section and with which to register options
 			$title,
@@ -238,6 +250,7 @@ class Settings {
 						'name'        => $page . '[' . $name . ']',
 						'value'       => $value,
 						'size'        => $size,
+						'step'        => Arr::sget( $args, 'step', 'any' ),
 						'placeholder' => $placeholder,
 						'disabled'    => $disabled ? 'disabled' : null,
 						'readonly'    => $readonly ? 'readonly' : null,
