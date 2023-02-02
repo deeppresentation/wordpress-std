@@ -179,6 +179,11 @@ class Acf {
 		return $res;
 	}
 
+
+	public static function get_group_field_bool( string $groupId, string $fieldId, ?int $postId = null, bool $def = false ) {
+		return self::get_group_field( $groupId, $fieldId, $postId, $def ) === '1';
+	}
+
 	public static function get_field_def_val( string $fieldId, $formatValue = false, $def = null ) {
 		$field_cfg = \acf_get_field( $fieldId );
 		if ( $field_cfg ) {

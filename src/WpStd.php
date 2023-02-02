@@ -38,10 +38,10 @@ class WpStd {
 	// $exceptionTerms taxonomy-name=>taxonomy-value  Set force to False if you want to send them to Trash.
 	public static function delete_meta_in_all_posts( string $postType, string $metaId, array $exceptionByTaxonomy = null ) {
 		$allCountryPosts = get_posts(
-			array(
+			[
 				'post_type'   => $postType,
 				'numberposts' => -1,
-			)
+			]
 		);
 		foreach ( $allCountryPosts as $post ) {
 			$doNotDelete = false;
@@ -63,10 +63,10 @@ class WpStd {
 	// $exceptionTerms taxonomy-name=>taxonomy-value  Set force to False if you want to send them to Trash.
 	public static function delete_all_posts( string $postType, bool $force = true, array $exceptionByTaxonomy = null ) {
 		$allCountryPosts = get_posts(
-			array(
+			[
 				'post_type'   => $postType,
 				'numberposts' => -1,
-			)
+			]
 		);
 		foreach ( $allCountryPosts as $post ) {
 			$doNotDelete = false;
@@ -127,12 +127,12 @@ class WpStd {
 		if ( ! $post_type ) {
 			$post_type = get_post_types();
 		}
-		$args  = array(
+		$args  = [
 			'name'        => $post_slug,
 			'post_type'   => $post_type,
 			'post_status' => 'any',
 			'numberposts' => 1,
-		);
+		];
 		$posts = get_posts( $args );
 
 		if ( ! $posts || count( $posts ) == 0 ) {
@@ -159,7 +159,7 @@ class WpStd {
 				$post_url_path = get_site_url();
 			}
 			if ( ! $post_type ) {
-				$post_type = array_values( get_post_types( array( 'public' => true ) ) );
+				$post_type = array_values( get_post_types( [ 'public' => true ] ) );
 			}
 			$res = get_page_by_path( $post_url_path, OBJECT, $post_type );
 			if ( ! $res ) {
@@ -179,10 +179,10 @@ class WpStd {
 		if ( $post_id == 0 ) {
 			// Try custom post types
 			$cpts = get_post_types(
-				array(
+				[
 					'public'   => true,
 					'_builtin' => false,
-				),
+				],
 				'objects',
 				'and'
 			);
@@ -197,11 +197,11 @@ class WpStd {
 					if ( strlen( $path ) > strlen( $cpt_slug ) && substr( $path, 0, strlen( $cpt_slug ) ) == $cpt_slug ) {
 						$slug  = substr( $path, strlen( $cpt_slug ) );
 						$query = new \WP_Query(
-							array(
+							[
 								'post_type'      => $cpt_name,
 								'name'           => $slug,
 								'posts_per_page' => 1,
-							)
+							]
 						);
 						if ( is_object( $query->post ) ) {
 							$post_id = $query->post->ID;
@@ -241,3 +241,5 @@ class WpStd {
 
 	// !SECTION End - Private
 }
+
+?>

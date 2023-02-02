@@ -47,22 +47,22 @@ class AdminNotice {
 		);
 	}
 
-	public static function get_ask_for_rating_text( int $activeWeeks, string $productName, string $textDomain, $add_greeting_at_the_end = true ) {
+	public static function get_ask_for_rating_text( int $activeWeeks, string $productName, $add_greeting_at_the_end = true ) {
 		$plugin_name = '<strong>' . $productName . '</strong>';
 		if ( $activeWeeks > 16 ) {
 			$time_in_use_text = sprintf( esc_html( _n( '%d month', '%d months', floor( $activeWeeks / 4 ), 'DP_TEXT_DOMAIN_TO_PREFIX' ) ), floor( $activeWeeks / 4 ) );
 		} else {
 			$time_in_use_text = sprintf( esc_html( _n( '%d week', '%d weeks', $activeWeeks, 'DP_TEXT_DOMAIN_TO_PREFIX' ) ), $activeWeeks );
 		}
-		$text = sprintf( __( "Amazing, you've been using the %1\$s for over %2\$s.<br>Nice rating helps us grow, so we can <strong>serve you better</strong> via our support and develop <strong>new cool features</strong> into this free product.<br>We really appreciate Your help. It takes just one minute. Thank You:)<br>", $textDomain ), $plugin_name, $time_in_use_text );
+		$text = sprintf( __( "Amazing, you've been using the %1\$s for over %2\$s.<br>Nice rating helps us grow, so we can <strong>serve you better</strong> via our support and develop <strong>new cool features</strong> into this free product.<br>We really appreciate Your help. It takes just one minute. Thank You:)<br>", 'DP_TEXT_DOMAIN_TO_PREFIX' ), $plugin_name, $time_in_use_text );
 		if ( $add_greeting_at_the_end ) {
 			$text .= __( '<strong>Your DeepPresentation Team</strong>', 'DP_TEXT_DOMAIN_TO_PREFIX' );
 		}
 		return $text;
 	}
 
-	public static function render_ask_for_rating_notice( int $activeWeeks, string $productName, string $linkForRating, string $textDomain, string $notice_id = 'a4r-notice', string $imgUrl = null, string $imgAlt = '', string $notice_class = 'dp-notice' ) {
-		$text = self::get_ask_for_rating_text( $activeWeeks, $productName, $textDomain );
+	public static function render_ask_for_rating_notice( int $activeWeeks, string $productName, string $linkForRating, string $notice_id = 'a4r-notice', string $imgUrl = null, string $imgAlt = '', string $notice_class = 'dp-notice', string $img_class = '' ) {
+		$text = self::get_ask_for_rating_text( $activeWeeks, $productName );
 		AdminNotice::render_raw_notice(
 			\array_filter(
 				[
@@ -72,7 +72,7 @@ class AdminNotice {
 						[
 							'src'   => $imgUrl,
 							'alt'   => $imgAlt,
-							'class' => 'dp-intro-tour-a4r-5star-img',
+							'class' => $img_class,
 						],
 						null,
 						null,
@@ -88,7 +88,7 @@ class AdminNotice {
 							'id'     => 'a4r-link-OK',
 							'class'  => 'button button-primary button-pro-promo',
 						],
-						__( 'OK, you deserved it', $textDomain )
+						__( 'OK, you deserved it', 'DP_TEXT_DOMAIN_TO_PREFIX' )
 					),
 					'<br>',
 					new Element(
@@ -98,7 +98,7 @@ class AdminNotice {
 							'href' => '#',
 							'id'   => 'a4r-link-already-did',
 						],
-						__( 'I already did', $textDomain ),
+						__( 'I already did', 'DP_TEXT_DOMAIN_TO_PREFIX' ),
 						'already-did'
 					),
 					new Element(
@@ -108,7 +108,7 @@ class AdminNotice {
 							'href' => '#',
 							'id'   => 'a4r-link-no-good',
 						],
-						__( 'No, not good enough', $textDomain ),
+						__( 'No, not good enough', 'DP_TEXT_DOMAIN_TO_PREFIX' ),
 						'no-good'
 					),
 				]

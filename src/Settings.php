@@ -17,10 +17,10 @@ class Settings {
 
 	public static function update_setting_array( string $optionId, string $optionSubFieldId, $value, bool $createIfNotExist = false ) : bool {
 		$options = get_option( $optionId, null );
-		if ( ! isset( $options ) && $createIfNotExist ) {
+		if ( ! \is_array( $options ) && $createIfNotExist ) {
 			$options = [];
 		}
-		if ( isset( $options ) && ( array_key_exists( $optionSubFieldId, $options ) || $createIfNotExist ) ) {
+		if ( is_array( $options ) && ( array_key_exists( $optionSubFieldId, $options ) || $createIfNotExist ) ) {
 			$options[ $optionSubFieldId ] = $value;
 			return update_option( $optionId, $options );
 		}
@@ -29,7 +29,7 @@ class Settings {
 
 	public static function get_setting_array_field( string $optionId, string $optionSubFieldId, $def = '' ) {
 		$options = get_option( $optionId );
-		if ( $options && array_key_exists( $optionSubFieldId, $options ) ) {
+		if ( $options && is_array( $options ) && array_key_exists( $optionSubFieldId, $options ) ) {
 			return $options[ $optionSubFieldId ];
 		}
 		return $def;
@@ -38,6 +38,11 @@ class Settings {
 	public static function get_setting_array_bool( string $optionId, string $optionSubFieldId, bool $def = false ) {
 		return self::get_setting_array_field( $optionId, $optionSubFieldId, $def ) === '1';
 	}
+
+	public static function update_setting_array_bool( string $optionId, string $optionSubFieldId, bool $value, bool $createIfNotExist = false ) {
+		return self::update_setting_array( $optionId, $optionSubFieldId, $value ? '1' : '0', $createIfNotExist );
+	}
+
 
 
 	public static function get_user_data( $key, $sub_key, $user_id, $def ) {
@@ -89,7 +94,7 @@ class Settings {
 	}
 
 	public static function init_setting_array( string $optionId, string $sectionId, string $sectionTitle,
-		string $page, array $fields = [], $renderDescriptionClb = null, bool $cleanNotSupportedFields = false ) {
+		string $page, array $fields = [], $renderDescriptionClb = null, bool $cleanNotSupportedFields = false, $option_root_class = 'dp-settings' ) {
 		$options = get_option( $optionId, null );
 		if ( is_null( $options ) ) {
 			if ( add_option( $optionId, [] ) ) {
@@ -103,7 +108,7 @@ class Settings {
 				}
 			}
 		}
-		self::add_settings_section( $sectionId, $sectionTitle, $options, $page, $fields, $renderDescriptionClb, $cleanNotSupportedFields, $optionId );
+		self::add_settings_section( $sectionId, $sectionTitle, $options, $page, $fields, $renderDescriptionClb, $cleanNotSupportedFields, $optionId, $option_root_class );
 
 		register_setting(
 			$optionId,
@@ -112,7 +117,7 @@ class Settings {
 	}
 
 	public static function add_settings_section( string $sectionId, string $title, array $options,
-		string $page, array $fields = [], $renderDescriptionClb = null, bool $cleanNotSupportedFields = false, string $optionId = '' ) {
+		string $page, array $fields = [], $renderDescriptionClb = null, bool $cleanNotSupportedFields = false, string $optionId = '', $option_root_class = 'dp-settings' ) {
 		add_settings_section(
 			$sectionId,                     // ID used to identify this section and with which to register options
 			$title,
@@ -144,14 +149,15 @@ class Settings {
 				$sectionId,
 				$options,
 				Arr::sget( $field, 'renderArgs', [] ),
-				$optionId
+				$optionId,
+				$option_root_class
 			);
 
 		}
 	}
 
 	public static function add_settings_field( string $id, string $title, string $defVal, string $page,
-		string $section, array &$options, array $renderArgs = [], string $optionId = null ) {
+		string $section, array &$options, array $renderArgs = [], string $optionId = null, $option_root_class = 'dp-settings' ) {
 		if ( ! array_key_exists( $id, $options ) ) {
 			$options[ $id ] = $defVal;
 			if ( ! empty( $optionId ) ) {
@@ -163,9 +169,10 @@ class Settings {
 		}
 		$args = array_merge(
 			[
-				'page'  => $page,
-				'value' => $options[ $id ],
-				'name'  => $id,
+				'page'              => $page,
+				'value'             => $options[ $id ],
+				'name'              => $id,
+				'option_root_class' => $option_root_class,
 			],
 			$renderArgs
 		);
@@ -177,15 +184,15 @@ class Settings {
 				'DP\Wp\Settings::render_option',            // The name of the function responsible for rendering the option interface
 				$page,                              // The page on which this option will be displayed
 				$section,
-				$args
+				$args,
 			);
 		}
 
 	}
 
-	public static function render_hint( $hint, $proOnly, $disabled, $readonly ) {
+	public static function render_hint( $hint, $proOnly, $disabled, $readonly, $option_root_class ) {
 		if ( $hint ) {
-			$classes_hint = [ 'dp-settings__el__hint' ];
+			$classes_hint = [ $option_root_class . '__el__hint' ];
 			if ( $proOnly ) {
 				$classes_hint[] = 'dpit-pro-only';
 			}
@@ -212,22 +219,23 @@ class Settings {
 		$page = $args['page'];
 		$name = $args['name'];
 
-		$size        = Arr::sget( $args, 'size', 52 );
-		$type        = Arr::sget( $args, 'type', 'text' );
-		$value       = Arr::sget( $args, 'value', '' );
-		$placeholder = Arr::sget( $args, 'placeholder', '' );
-		$hidden      = Arr::sget( $args, 'hidden', false );
-		$disabled    = Arr::sget( $args, 'disabled', '0' ) == '1';
-		$readonly    = Arr::sget( $args, 'readonly', '0' ) == '1';
-		$proOnly     = Arr::sget( $args, 'pro_only', '0' ) == '1';
-		$hint        = Arr::get( $args, 'hint' );
-		$style       = [];
+		$size              = Arr::sget( $args, 'size', 52 );
+		$type              = Arr::sget( $args, 'type', 'text' );
+		$value             = Arr::sget( $args, 'value', '' );
+		$placeholder       = Arr::sget( $args, 'placeholder', '' );
+		$hidden            = Arr::sget( $args, 'hidden', false );
+		$disabled          = Arr::sget( $args, 'disabled', '0' ) == '1';
+		$readonly          = Arr::sget( $args, 'readonly', '0' ) == '1';
+		$proOnly           = Arr::sget( $args, 'pro_only', '0' ) == '1';
+		$hint              = Arr::get( $args, 'hint' );
+		$option_root_class = Arr::get( $args, 'option_root_class' );
+		$style             = [];
 		if ( $hint ) {
 			$style = [
 				'margin-right' => '10px',
 			];
 		}
-		$classes = [ 'dp-settings__el' ];
+		$classes = [ $option_root_class . '__el' ];
 		if ( $proOnly ) {
 			$readonly  = true;
 			$classes[] = 'dpit-pro-only';
@@ -305,12 +313,13 @@ class Settings {
 					);
 					break;
 				case 'action':
-						$action = Arr::sget( $args, 'name', '' );
+						$action         = Arr::sget( $args, 'name', '' );
+						$btn_root_class = Arr::sget( $args, 'btn_root_class', 'dp-action-button' );
 						Html::render(
 							'div',
-							'button dp-intro-admin-edit-btn dp-intro-admin-edit-btn--settings',
+							"button $btn_root_class $btn_root_class--settings",
 							null,
-							Html::get_str( 'span', 'dp-intro-admin-edit-btn__text', null, Arr::sget( $args, 'title', $action ) ),
+							Html::get_str( 'span', $btn_root_class . '__text', null, Arr::sget( $args, 'title', $action ) ),
 							[
 								'data-msg-success' => Arr::sget( $args, 'msg_success', '' ),
 								'data-msg-failed'  => Arr::sget( $args, 'msg_failed', '' ),
@@ -353,14 +362,14 @@ class Settings {
 
 				case 'description':
 					$desc_content = Arr::sget( $args, 'desc_content', '' );
-					$classes[]    = 'dp-settings__el--desc';
+					$classes[]    = $option_root_class . '__el--desc';
 					if ( $desc_content ) {
 						Html::render( 'div', $classes, $style, $desc_content );
 
 					}
 					break;
 			}
-			self::render_hint( $hint, $proOnly, $disabled, $readonly );
+			self::render_hint( $hint, $proOnly, $disabled, $readonly, $option_root_class );
 		}
 	}
 }
