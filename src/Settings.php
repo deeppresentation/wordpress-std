@@ -184,7 +184,7 @@ class Settings {
 				'DP\Wp\Settings::render_option',            // The name of the function responsible for rendering the option interface
 				$page,                              // The page on which this option will be displayed
 				$section,
-				$args,
+				$args
 			);
 		}
 
